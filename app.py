@@ -137,9 +137,9 @@ with tab4:
     default_regresi = f"y = {st.session_state.get('regresi_a', 1.234):.4f} + {st.session_state.get('regresi_b', 0.012):.4f}x"
     regresi = st.text_input("Persamaan regresi kalibrasi (format: y = a + bx)", default_regresi)
 
-    faktor_pengencer = st.number_input("Faktor Pengenceran", min_value=1, value=10)
-    volume_labu = st.number_input("Volume Labu Takar (mL)", min_value=0, value=100)
-    bobot_sample = st.number_input("Bobot Sampel (gram)", min_value=0.0000, value=1.0000)
+    faktor_pengencer = st.number_input("Faktor Pengenceran", min_value=1)
+    volume_labu = st.number_input("Volume Labu Takar (mL)", min_value=0)
+    bobot_sample = st.number_input("Bobot Sampel (gram)", min_value=0.0000, format="%.4f")
 
     if st.button("Hitung Kadar Sampel"):
         try:
