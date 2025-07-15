@@ -18,7 +18,7 @@ menu = st.sidebar.radio("Navigasi", [
     "📌 Standar Induk", 
     "📊 Deret Standar", 
     "📈 Kurva Kalibrasi",  
-    "🧪 Kadar Sampel" 
+    "🧪 Kadar Sampel", 
     "📖 Tentang Kami"
 ])
 
@@ -336,11 +336,11 @@ elif menu == "🧪 Kadar Sampel":
             st.error(f"Error: {e}")
 
 # Halaman 5: Tentang Kami
-elif menu == ""📖 Tentang Kami":
+elif menu == "📖 Tentang Kami":
     st.header("📖 Tentang Kami")
 
     anggota = [
-        {"nama": "Devi  Triana Rahmadina", "nim": "2460352"},
+        {"nama": "Devi Triana Rahmadina", "nim": "2460352"},
         {"nama": "Indra Alfin Nur Riski", "nim": "2460389"},
         {"nama": "Muhammad Diptarrama Rids", "nim": "2460436"},
         {"nama": "Saskia Arizqa Syaakirah", "nim": "2460511"},
@@ -351,8 +351,8 @@ elif menu == ""📖 Tentang Kami":
     for idx, anggota_data in enumerate(anggota):
         with [col1, col2, col3][idx % 3]:
             st.markdown(f"""
-            <div style="background-color: #f0f0f5; padding: 15px; border-radius: 10px; margin: 10px 0;">
-                <h4 style="color:#2c3e50;">{anggota_data['nama']}</h4>
-                <p><strong>NIM:</strong> {anggota_data['nim']}</p>
-            </div>
+                <div style="background-color: #f0f0f5; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                    <h4 style="color:#2c3e50;">{anggota_data['nama']}</h4>
+                    <p><strong>NIM:</strong> {anggota_data['nim']}</p>
+                </div>
             """, unsafe_allow_html=True)
