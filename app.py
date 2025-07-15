@@ -132,7 +132,7 @@ import re  # Tambahkan import ini di atas jika belum
 with tab4:
     st.header("🧪 4. Hitung Kadar dari Absorbansi (Input Manual)")
 
-    absorb_str = st.text_area("Masukkan absorbansi sampel (pisahkan dengan koma)", "0.523")
+    absorb_str = st.text_area("Masukkan absorbansi sampel (pisahkan dengan koma)")
 
     # Ambil nilai a dan b dari session_state kalau ada
     default_regresi = f"y = {st.session_state.get('regresi_a', 1.234):.4f} + {st.session_state.get('regresi_b', 0.012):.4f}x"
