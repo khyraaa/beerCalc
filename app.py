@@ -9,17 +9,64 @@ from sklearn.metrics import r2_score
 from collections import defaultdict
 
 
-st.set_page_config(page_title="Spectro", layout="centered")
-st.title("🔬 Web Aplikasi Spektrofotometri")
+# konfigurasi tampilan 
+st.set_page_config(page_title="Perhitungan Spektrofotometri", layout="centered")
 
-tab1, tab2, tab3, tab4 = st.tabs([
+# Sidebar Navigasi
+menu = st.sidebar.radio("Navigasi", [
+    "🏠 Beranda",
     "📌 Standar Induk", 
     "📊 Deret Standar", 
     "📈 Kurva Kalibrasi",  
     "🧪 Kadar Sampel" 
+    "📖 Tentang Kami"
 ])
 
+# Halaman BERANDA (HOME)
+if menu == "🏠 Beranda":
+    st.markdown("""
+        <style>
+        .centered {
+            text-align: center;
+            padding: 30px 0;
+        }
+        .judul {
+            font-size: 50px;
+            font-weight: 800;
+            color: #4FC3F7;
+            text-shadow: 1px 1px 2px #00000060;
+        }
+        .subjudul {
+            font-size: 24px;
+            color: #E0F7FA;
+            margin-bottom: 30px;
+        }
+        .desc {
+            font-size: 18px;
+            color: #EEEEEE;
+            max-width: 700px;
+            margin: auto;
+            line-height: 1.6;
+        }
+        .img-container {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        </style>
 
+        <div class='centered'>
+            <div class='judul'>Perhitungan Spektrofotometri</div>
+            <div class='subjudul'>📚 Welcome to our website!</div>
+            <div class='img-container'>
+                <img src='https://cdn-icons-png.flaticon.com/512/2933/2933116.png' width='130'/>
+            </div>
+            <div class='desc'>
+                Aplikasi ini membantu Anda menghitung massa molekul relatif (BM/Mr) dari suatu senyawa atau garam berdasarkan rumus kimia yang Anda masukkan. 
+                Silakan pilih halaman di samping untuk mulai menghitung, membuat larutan standar, atau menganalisis data spektrofotometri.
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
 # ---------------------
 # Data Massa Atom Relatif
 # ---------------------
@@ -99,10 +146,8 @@ def hitung_bm(formula):
     total = sum(massa_atom[el] * jumlah for el, jumlah in parsed.items())
     return round(total, 4)
 
-# =============================
-# 1. STANDAR INDUK
-# =============================
-with tab1:
+# Halaman 1: Standar Induk
+elif menu == "📌 Standar Induk":
     st.header("📌 1. Pembuatan Larutan Standar Induk")
     
     # Input rumus kimia otomatis hitung BM
@@ -145,11 +190,9 @@ with tab1:
                 st.success(f"🔹 Ambil {V1:.2f} mL larutan pekat, encerkan hingga {V2} mL")
             except:
                 st.error("Input tidak valid.")
-# -----------------------------
-# 2. DERET STANDAR
-# -----------------------------
 
-with tab2:
+# Halaman 2: Deret Standar
+elif menu == "📊 Deret Standar":
     st.header("📊 2. Deret Standar dari Larutan Induk")
 
     vol_total_str = st.text_input("Volume labu masing-masing larutan (mL)", placeholder="Contoh: 10")
@@ -170,11 +213,8 @@ with tab2:
         except:
             st.error("Periksa kembali format input Anda. Pastikan semua angka valid dan tidak kosong.")
 
-
-# -----------------------------
-# 3. KURVA KALIBRASI
-# -----------------------------
-with tab3:
+# Halaman 3: Kurva Kalibrasi
+elif menu == "📈 Kurva Kalibrasi":
     st.header("📈 3. Kurva Kalibrasi & Regresi")
 
     kons_cal = st.text_input("Konsentrasi Standar (mg/L)", placeholder="Contoh: 0.2, 0.4, 0.6")
@@ -211,12 +251,8 @@ with tab3:
         except Exception as e:
             st.error(f"Terjadi kesalahan: {e}")
 
-# -----------------------------
-# 4. ABSORBANSI & KADAR
-# -----------------------------
-import re  # Tambahkan import ini di atas jika belum
-
-with tab4:
+# Halaman 4: Kadar Sampel 
+elif menu == "🧪 Kadar Sampel":
     st.header("🧪 4. Hitung Kadar dari Absorbansi (Input Manual)")
 
     absorb_str = st.text_area("Masukkan absorbansi sampel (pisahkan dengan koma)")
@@ -298,3 +334,25 @@ with tab4:
 
         except Exception as e:
             st.error(f"Error: {e}")
+
+# Halaman 5: Tentang Kami
+elif menu == ""📖 Tentang Kami":
+    st.header("📖 Tentang Kami")
+
+    anggota = [
+        {"nama": "Devi  Triana Rahmadina", "nim": "2460352"},
+        {"nama": "Indra Alfin Nur Riski", "nim": "2460389"},
+        {"nama": "Muhammad Diptarrama Rids", "nim": "2460436"},
+        {"nama": "Saskia Arizqa Syaakirah", "nim": "2460511"},
+        {"nama": "Yasmin Anbarcitra", "nim": "2460536"},
+    ]
+
+    col1, col2, col3 = st.columns(3)
+    for idx, anggota_data in enumerate(anggota):
+        with [col1, col2, col3][idx % 3]:
+            st.markdown(f"""
+            <div style="background-color: #f0f0f5; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                <h4 style="color:#2c3e50;">{anggota_data['nama']}</h4>
+                <p><strong>NIM:</strong> {anggota_data['nim']}</p>
+            </div>
+            """, unsafe_allow_html=True)
