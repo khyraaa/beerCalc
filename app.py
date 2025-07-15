@@ -12,8 +12,8 @@ st.title("🔬 Web Aplikasi Spektrofotometri")
 tab1, tab2, tab3, tab4 = st.tabs([
     "📌 Standar Induk", 
     "📊 Deret Standar", 
-    "📈 Kadar Sampel",  #ini pindah ke tab3
-    "🧪 Kurva Kalibrasi" #inipindah ke tab4
+    "📈 Kurva Kalibrasi",  
+    "🧪 Kadar Sampel" 
 ])
 
 # -----------------------------
