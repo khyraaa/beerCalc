@@ -22,6 +22,9 @@ menu = st.sidebar.radio("Navigasi", [
     "📖 Tentang Kami"
 ])
 
+# DEBUG: Menampilkan menu yang aktif
+st.write("🔍 Menu aktif saat ini:", menu)
+
 # Halaman BERANDA (HOME)
 if menu == "🏠 Beranda":
     st.markdown("""
