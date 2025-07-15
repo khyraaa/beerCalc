@@ -10,7 +10,7 @@ from collections import defaultdict
 
 
 # konfigurasi tampilan 
-st.set_page_config(page_title="Perhitungan Spektrofotometri", layout="centered")
+st.set_page_config(page_title="Perhitungan Spektrofotometri", layout="wide")
 
 # Sidebar Navigasi
 menu = st.sidebar.radio("Navigasi", [
