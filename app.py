@@ -61,7 +61,9 @@ with tab1:
 # -----------------------------
 # 2. DERET STANDAR
 # -----------------------------
-st.header("📊 2. Deret Standar dari Larutan Induk")
+
+with tab2:
+    st.header("📊 2. Deret Standar dari Larutan Induk")
 
     vol_total_str = st.text_input("Volume labu masing-masing larutan (mL)", placeholder="Contoh: 10")
     kons_induk_str = st.text_input("Konsentrasi larutan induk (mol/L)", placeholder="Contoh: 1.0")
@@ -80,7 +82,6 @@ st.header("📊 2. Deret Standar dari Larutan Induk")
             st.dataframe(df)
         except:
             st.error("Periksa kembali format input Anda. Pastikan semua angka valid dan tidak kosong.")
-
 
 
 # -----------------------------
