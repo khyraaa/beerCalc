@@ -117,11 +117,6 @@ with tab1:
         bm_senyawa = hitung_bm(rumus_senyawa) if rumus_senyawa else 0.0
         st.number_input("BM Senyawa (g/mol)", value=bm_senyawa, format="%.4f", key="bm_senyawa")
 
-    st.markdown("----")
-    st.subheader("📘 Tabel Massa Atom Relatif (Ar)")
-    df_ar = pd.DataFrame(list(massa_atom.items()), columns=["Unsur", "Ar"]).sort_values("Unsur")
-    st.dataframe(df_ar, use_container_width=True)
-
     # Perhitungan metode
     metode = st.radio("Metode Pembuatan Larutan:", ["Dari zat padat", "Dari larutan pekat"])
 
