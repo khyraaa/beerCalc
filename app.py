@@ -6,14 +6,14 @@ import seaborn as sns
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 
-st.set_page_config(page_title="UV-Vis Web App", layout="centered")
-st.title("🔬 Web Aplikasi Spektrofotometri UV-Vis")
+st.set_page_config(page_title="Spectro", layout="centered")
+st.title("🔬 Web Aplikasi Spektrofotometri")
 
 tab1, tab2, tab3, tab4 = st.tabs([
     "📌 Standar Induk", 
     "📊 Deret Standar", 
-    "📈 Kurva Kalibrasi", 
-    "🧪 Kadar Sampel"
+    "📈 Kadar Sampel",  #ini pindah ke tab3
+    "🧪 Kurva Kalibrasi" #inipindah ke tab4
 ])
 
 # -----------------------------
@@ -61,7 +61,7 @@ with tab2:
             data = []
             for C2 in kons_list:
                 V1 = (C2 * vol_total) / kons_induk
-                data.append([m2, v1, vol_total - v1])
+                data.append([C2, V1, vol_total - V1])
             df = pd.DataFrame(data, columns=["Konsentrasi (mg/L)", "Volume Induk (mL)", "Volume Pelarut (mL)"])
             st.dataframe(df)
         except:
