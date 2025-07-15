@@ -126,14 +126,17 @@ with tab3:
 # -----------------------------
 # 4. ABSORBANSI & KADAR
 # -----------------------------
+import re  # Tambahkan import ini di atas jika belum
+
 with tab4:
     st.header("🧪 4. Hitung Kadar dari Absorbansi (Input Manual)")
 
     absorb_str = st.text_area("Masukkan absorbansi sampel (pisahkan dengan koma)", "0.523, 0.518, 0.521")
+
+    # Ambil nilai a dan b dari session_state kalau ada
     default_regresi = f"y = {st.session_state.get('regresi_a', 1.234):.4f} + {st.session_state.get('regresi_b', 0.012):.4f}x"
     regresi = st.text_input("Persamaan regresi kalibrasi (format: y = a + bx)", default_regresi)
 
-    
     faktor_pengencer = st.number_input("Faktor Pengenceran", min_value=1.0, value=10.0)
     volume_labu = st.number_input("Volume Labu Takar (mL)", min_value=0.0, value=100.0)
     bobot_sample = st.number_input("Bobot Sampel (gram)", min_value=0.0, value=1.0)
@@ -141,26 +144,34 @@ with tab4:
     if st.button("Hitung Kadar Sampel"):
         try:
             absorb = np.array([float(i.strip()) for i in absorb_str.split(",")])
-            a, b = regresi.replace("y", "").replace("=", "").split("x")
-            a = float(a.strip())
-            b = float(b.strip())
 
+            # ✅ PARSING REGRESI DENGAN REGEX
+            match = re.search(r"y\s*=\s*([-+]?\d*\.?\d+)\s*\+\s*([-+]?\d*\.?\d+)x", regresi)
+            if match:
+                a = float(match.group(1))
+                b = float(match.group(2))
+            else:
+                st.error("Format persamaan regresi salah. Gunakan format: y = a + bx")
+                st.stop()
+
+            # Hitung konsentrasi dan kadar
             konsentrasi_terukur = (absorb - a) / b
             kadar_sampel = (konsentrasi_terukur * faktor_pengencer * volume_labu / 1000) / bobot_sample * 1000
 
+            # Statistik
             rata2 = np.mean(kadar_sampel)
             std = np.std(kadar_sampel, ddof=1)
             rsd = (std / rata2) * 100
             rpd = (np.max(kadar_sampel) - np.min(kadar_sampel)) / rata2 * 100
 
-            # Tabel detail per sampel
+            # Tabel detail
             df_sampel = pd.DataFrame({
                 "Absorbansi": absorb,
                 "Konsentrasi Terukur (mg/L)": konsentrasi_terukur,
                 "Kadar Sampel (mg/kg)": kadar_sampel
             })
 
-            # Tabel ringkasan statistik
+            # Tabel ringkasan
             df_ringkasan = pd.DataFrame({
                 "Keterangan": [
                     "Rata-rata Kadar (mg/kg)", 
@@ -176,6 +187,7 @@ with tab4:
                 ]
             })
 
+            # Output
             st.subheader("📊 Data Sampel")
             st.dataframe(df_sampel)
 
