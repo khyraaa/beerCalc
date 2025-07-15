@@ -72,8 +72,8 @@ with tab2:
 # -----------------------------
 # 3. KALIBRASI
 # -----------------------------
-with tab4:
-    st.header("📈 4. Kurva Kalibrasi & Regresi")
+with tab3:
+    st.header("📈 3. Kurva Kalibrasi & Regresi")
 
     kons_cal = st.text_input("Konsentrasi Standar (mol/L)", "0.2, 0.4, 0.6, 0.8, 1.0")
     abs_cal = st.text_input("Absorbansi Standar", "0.25, 0.48, 0.75, 1.03, 1.28")
@@ -102,32 +102,49 @@ with tab4:
 # -----------------------------
 # 4. ABSORBANSI & KADAR
 # -----------------------------
-with tab3:
-    st.header("🧪 3. Hitung Kadar dari Absorbansi (Input Manual)")
+with tab4:
+    st.header("🧪 4. Hitung Kadar dari Absorbansi (Input Manual)")
 
     absorb_str = st.text_area("Masukkan absorbansi sampel (pisahkan dengan koma)", "0.523, 0.518, 0.521")
     regresi = st.text_input("Persamaan regresi kalibrasi (format: y = a + bx)", "y = 1.234 + 0.012x")
 
+    faktor_pengencer = st.number_input("Faktor Pengenceran", min_value=1.0, value=10.0)
+    volume_labu = st.number_input("Volume Labu Takar (mL)", min_value=0.0, value=100.0)
+    bobot_sample = st.number_input("Bobot Sampel (gram)", min_value=0.0, value=1.0)
+
     if st.button("Hitung Kadar Sampel"):
         try:
+            # Ambil absorbansi dalam array
             absorb = np.array([float(i.strip()) for i in absorb_str.split(",")])
+
+            # Parsing persamaan regresi
             a, b = regresi.replace("y", "").replace("=", "").split("x")
             a = float(a.strip())
             b = float(b.strip())
-            konsentrasi terukur = (absorb - a) / b
-            rata2 = np.mean(kadar)
-            std = np.std(kadar, ddof=1)
-            rsd = (std / rata2) * 100
-            rpd = (np.max(kadar) - np.min(kadar)) / rata2 * 100
 
+            # Hitung konsentrasi terukur dalam mg/L
+            konsentrasi_terukur = (absorb - a) / b
+
+            # Hitung kadar akhir (mg/kg)
+            kadar_sampel = (konsentrasi_terukur * faktor_pengencer * volume_labu / 1000) / bobot_sample * 1000
+
+            # Statistik
+            rata2 = np.mean(kadar_sampel)
+            std = np.std(kadar_sampel, ddof=1)
+            rsd = (std / rata2) * 100
+            rpd = (np.max(kadar_sampel) - np.min(kadar_sampel)) / rata2 * 100
+
+            # Tampilkan DataFrame
             df_sampel = pd.DataFrame({
                 "Absorbansi": absorb,
-                "Kadar (mol/L)": kadar
+                "Konsentrasi Terukur (mg/L)": konsentrasi_terukur,
+                "Kadar Sampel (mg/kg)": kadar_sampel
             })
 
             st.dataframe(df_sampel)
-            st.success(f"Rata-rata kadar: {rata2:.4f} mol/L")
+            st.success(f"Rata-rata kadar sampel: {rata2:.4f} mg/kg")
             st.info(f"RSD: {rsd:.2f}% | RPD: {rpd:.2f}%")
 
         except Exception as e:
             st.error(f"Error: {e}")
+
