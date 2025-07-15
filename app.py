@@ -12,8 +12,8 @@ st.title("🔬 Web Aplikasi Spektrofotometri UV-Vis")
 tab1, tab2, tab3, tab4 = st.tabs([
     "📌 Standar Induk", 
     "📊 Deret Standar", 
-    "🧪 Sampel & Kadar", 
-    "📈 Kalibrasi"
+    "📈 Kurva Kalibrasi", 
+    "🧪 Kadar Sampel"
 ])
 
 # -----------------------------
