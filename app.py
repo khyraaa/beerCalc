@@ -137,13 +137,27 @@ with tab4:
     default_regresi = f"y = {st.session_state.get('regresi_a', 1.234):.4f} + {st.session_state.get('regresi_b', 0.012):.4f}x"
     regresi = st.text_input("Persamaan regresi kalibrasi (format: y = a + bx)", default_regresi)
 
-    faktor_pengencer = st.number_input("Faktor Pengenceran", min_value=1)
-    volume_labu = st.number_input("Volume Labu Takar (mL)", min_value=0)
-    bobot_sample = st.number_input("Bobot Sampel (gram)", min_value=0.0000, format="%.4f")
+    # Input sebagai text agar bisa kosong
+    faktor_pengencer_str = st.text_input("Faktor Pengenceran", placeholder="Contoh: 10")
+    volume_labu_str = st.text_input("Volume Labu Takar (mL)", placeholder="Contoh: 100")
+    bobot_sample_str = st.text_input("Bobot Sampel (gram)", placeholder="Contoh: 1.0000")
 
     if st.button("Hitung Kadar Sampel"):
         try:
             absorb = np.array([float(i.strip()) for i in absorb_str.split(",")])
+
+            # Validasi input numerik
+            if not faktor_pengencer_str.strip() or not volume_labu_str.strip() or not bobot_sample_str.strip():
+                st.warning("Mohon lengkapi semua input angka terlebih dahulu.")
+                st.stop()
+
+            faktor_pengencer = float(faktor_pengencer_str)
+            volume_labu = float(volume_labu_str)
+            bobot_sample = float(bobot_sample_str)
+
+            if faktor_pengencer <= 0 or volume_labu <= 0 or bobot_sample <= 0:
+                st.error("Semua nilai harus lebih dari 0.")
+                st.stop()
 
             # ✅ PARSING REGRESI DENGAN REGEX
             match = re.search(r"y\s*=\s*([-+]?\d*\.?\d+)\s*\+\s*([-+]?\d*\.?\d+)x", regresi)
