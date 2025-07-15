@@ -99,65 +99,57 @@ def hitung_bm(formula):
     total = sum(massa_atom[el] * jumlah for el, jumlah in parsed.items())
     return round(total, 4)
 
- st.header("📌 1. Pembuatan Larutan Standar Induk")
-
+# =============================
+# 1. STANDAR INDUK
+# =============================
+with tab1:
+    st.header("📌 1. Pembuatan Larutan Standar Induk")
+    
+    # Input rumus kimia otomatis hitung BM
     col1, col2 = st.columns(2)
     with col1:
         rumus_garam = st.text_input("🔹 Rumus Kimia Garam", placeholder="Contoh: NaCl")
-        bm_garam = hitung_bm(rumus_garam) if rumus_garam else None
-        st.number_input("BM Garam (g/mol)", value=bm_garam or 0.0, format="%.4f", key="bm_garam")
+        bm_garam = hitung_bm(rumus_garam) if rumus_garam else 0.0
+        st.number_input("BM Garam (g/mol)", value=bm_garam, format="%.4f", key="bm_garam")
 
     with col2:
         rumus_senyawa = st.text_input("🔹 Rumus Kimia Senyawa", placeholder="Contoh: Cl")
-        bm_senyawa = hitung_bm(rumus_senyawa) if rumus_senyawa else None
-        st.number_input("BM Senyawa (g/mol)", value=bm_senyawa or 0.0, format="%.4f", key="bm_senyawa")
+        bm_senyawa = hitung_bm(rumus_senyawa) if rumus_senyawa else 0.0
+        st.number_input("BM Senyawa (g/mol)", value=bm_senyawa, format="%.4f", key="bm_senyawa")
 
     st.markdown("----")
     st.subheader("📘 Tabel Massa Atom Relatif (Ar)")
     df_ar = pd.DataFrame(list(massa_atom.items()), columns=["Unsur", "Ar"]).sort_values("Unsur")
     st.dataframe(df_ar, use_container_width=True)
-# -----------------------------
-# 1. STANDAR INDUK
-# -----------------------------
-with tab1:
-    st.header("📌 1. Pembuatan Larutan Standar Induk")
-    metode = st.radio("Metode pembuatan:", ["Dari zat padat", "Dari larutan pekat"])
+
+    # Perhitungan metode
+    metode = st.radio("Metode Pembuatan Larutan:", ["Dari zat padat", "Dari larutan pekat"])
 
     if metode == "Dari zat padat":
-        ppm_str = st.text_input("Konsentrasi larutan yang diinginkan (mg/L)", placeholder="Contoh: 100")
-        V_str = st.text_input("Volume larutan (mL)", placeholder="Contoh: 100")
-        BMgaram_str = st.text_input("Bobot molekul garam (g/mol)", placeholder="Contoh: 58.44")
-        BMsenyawa_str = st.text_input("Bobot molekul senyawa (g/mol)", placeholder="Contoh: 35.45")
-
-        if st.button("Hitung Massa"):
+        ppm_str = st.text_input("Konsentrasi (mg/L)", placeholder="100")
+        V_str = st.text_input("Volume (mL)", placeholder="100")
+        if st.button("Hitung Massa Zat Padat"):
             try:
                 ppm = float(ppm_str)
                 V = float(V_str)
-                BMgaram = float(BMgaram_str)
-                BMsenyawa = float(BMsenyawa_str)
-                massa = ((BMgaram * ppm * (V / 1000)) / BMsenyawa) / 1000
+                massa = ((bm_garam * ppm * (V / 1000)) / bm_senyawa) / 1000
                 st.success(f"🔹 Massa zat padat yang dibutuhkan: {massa:.4f} gram")
             except:
-                st.error("Mohon isi semua input dengan angka yang valid.")
+                st.error("Mohon isi semua nilai dengan benar.")
 
     else:
-        C1_str = st.text_input("Konsentrasi larutan pekat (mg/L)", placeholder="Contoh: 1000")
-        C2_str = st.text_input("Konsentrasi akhir yang diinginkan (mg/L)", placeholder="Contoh: 100")
-        V2_str = st.text_input("Volume akhir yang diinginkan (mL)", placeholder="Contoh: 100")
-
-        if st.button("Hitung Volume Larutan Pekat"):
+        C1_str = st.text_input("Konsentrasi Pekat (mg/L)", placeholder="1000")
+        C2_str = st.text_input("Konsentrasi Target (mg/L)", placeholder="100")
+        V2_str = st.text_input("Volume Target (mL)", placeholder="100")
+        if st.button("Hitung Volume Pekat yang Dibutuhkan"):
             try:
                 C1 = float(C1_str)
                 C2 = float(C2_str)
                 V2 = float(V2_str)
-                if C1 > 0:
-                    V1 = (C2 * V2) / C1
-                    st.success(f"🔹 Ambil sebanyak {V1:.2f} mL larutan pekat dan encerkan hingga {V2} mL")
-                else:
-                    st.error("Konsentrasi larutan pekat tidak boleh nol.")
+                V1 = (C2 * V2) / C1
+                st.success(f"🔹 Ambil {V1:.2f} mL larutan pekat, encerkan hingga {V2} mL")
             except:
-                st.error("Mohon isi semua input dengan angka yang valid.")
-
+                st.error("Input tidak valid.")
 # -----------------------------
 # 2. DERET STANDAR
 # -----------------------------
