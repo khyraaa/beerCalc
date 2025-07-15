@@ -80,24 +80,45 @@ with tab3:
 
     if st.button("Buat Kurva Kalibrasi"):
         try:
-            x = np.array([float(i) for i in kons_cal.split(",")])
-            y = np.array([float(i) for i in abs_cal.split(",")])
-            model = LinearRegression()
-            model.fit(x.reshape(-1, 1), y)
-            y_pred = model.predict(x.reshape(-1, 1))
-            r2 = r2_score(y, y_pred)
+            # Pisahkan dan bersihkan input
+            x = np.array([float(i.strip()) for i in kons_cal.split(",") if i.strip() != ""])
+            y = np.array([float(i.strip()) for i in abs_cal.split(",") if i.strip() != ""])
 
-            fig, ax = plt.subplots()
-            sns.regplot(x=x, y=y, ax=ax, ci=None, line_kws={"color": "red"})
-            ax.set_title("Kurva Kalibrasi UV-Vis")
-            ax.set_xlabel("Konsentrasi (mg/L)")
-            ax.set_ylabel("Absorbansi")
-            st.pyplot(fig)
+            # Validasi: jumlah x dan y harus sama
+            if len(x) != len(y):
+                st.error("Jumlah konsentrasi dan absorbansi tidak sama.")
+            else:
+                # Regresi linear: Y = a + bX
+                model = LinearRegression()
+                model.fit(x.reshape(-1, 1), y)
+                y_pred = model.predict(x.reshape(-1, 1))
+                r2 = r2_score(y, y_pred)
 
-            st.success(f"Persamaan regresi: y = {model.coef_[0]:.4f}x + {model.intercept_:.4f}")
-            st.info(f"Koefisien Determinasi R² = {r2:.4f}")
-        except:
-            st.error("Input salah. Jumlah data harus sama.")
+                # Ambil koefisien regresi
+                b = model.coef_[0]         # slope
+                a = model.intercept_       # intercept
+
+                # Tampilkan grafik
+                fig, ax = plt.subplots()
+                sns.regplot(x=x, y=y, ax=ax, ci=None, line_kws={"color": "red"})
+                ax.set_title("Kurva Kalibrasi UV-Vis")
+                ax.set_xlabel("Konsentrasi (mg/L)")
+                ax.set_ylabel("Absorbansi")
+                st.pyplot(fig)
+
+                # Tampilkan hasil regresi
+                st.success(f"Persamaan regresi: y = {b:.4f}x + {a:.4f}")
+                st.info(f"Koefisien Determinasi R² = {r2:.4f}")
+
+                # Debugging tambahan (opsional)
+                st.write("📊 Data X (Konsentrasi):", x)
+                st.write("📊 Data Y (Absorbansi):", y)
+                st.write("📈 Slope (b):", b)
+                st.write("📈 Intercept (a):", a)
+
+        except Exception as e:
+            st.error(f"Terjadi kesalahan: {e}")
+
 
 # -----------------------------
 # 4. ABSORBANSI & KADAR
