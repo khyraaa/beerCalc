@@ -1,10 +1,13 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import re
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
+from collections import defaultdict
+
 
 st.set_page_config(page_title="Spectro", layout="centered")
 st.title("🔬 Web Aplikasi Spektrofotometri")
@@ -16,6 +19,103 @@ tab1, tab2, tab3, tab4 = st.tabs([
     "🧪 Kadar Sampel" 
 ])
 
+
+# ---------------------
+# Data Massa Atom Relatif
+# ---------------------
+massa_atom = {
+    "H": 1.008, "He": 4.0026, "Li": 6.94, "Be": 9.0122, "B": 10.81, "C": 12.01,
+    "N": 14.007, "O": 16.00, "F": 18.998, "Ne": 20.180, "Na": 22.990, "Mg": 24.305,
+    "Al": 26.982, "Si": 28.085, "P": 30.974, "S": 32.06, "Cl": 35.45, "Ar": 39.948,
+    "K": 39.098, "Ca": 40.078, "Sc": 44.956, "Ti": 47.867, "V": 50.942, "Cr": 51.996,
+    "Mn": 54.938, "Fe": 55.845, "Co": 58.933, "Ni": 58.693, "Cu": 63.546, "Zn": 65.38,
+    "Ga": 69.723, "Ge": 72.63, "As": 74.922, "Se": 78.971, "Br": 79.904, "Kr": 83.798,
+    "Rb": 85.468, "Sr": 87.62, "Y": 88.906, "Zr": 91.224, "Nb": 92.906, "Mo": 95.95,
+    "Tc": 98, "Ru": 101.07, "Rh": 102.91, "Pd": 106.42, "Ag": 107.87, "Cd": 112.41,
+    "In": 114.82, "Sn": 118.71, "Sb": 121.76, "Te": 127.60, "I": 126.90, "Xe": 131.29,
+    "Cs": 132.91, "Ba": 137.33, "La": 138.91, "Ce": 140.12, "Pr": 140.91, "Nd": 144.24,
+    "Pm": 145, "Sm": 150.36, "Eu": 151.96, "Gd": 157.25, "Tb": 158.93, "Dy": 162.50,
+    "Ho": 164.93, "Er": 167.26, "Tm": 168.93, "Yb": 173.05, "Lu": 174.97, "Hf": 178.49,
+    "Ta": 180.95, "W": 183.84, "Re": 186.21, "Os": 190.23, "Ir": 192.22, "Pt": 195.08,
+    "Au": 196.97, "Hg": 200.59, "Tl": 204.38, "Pb": 207.2, "Bi": 208.98, "Po": 209,
+    "At": 210, "Rn": 222, "Fr": 223, "Ra": 226, "Ac": 227, "Th": 232.04, "Pa": 231.04,
+    "U": 238.03, "Np": 237, "Pu": 244, "Am": 243, "Cm": 247, "Bk": 247, "Cf": 251,
+    "Es": 252, "Fm": 257, "Md": 258, "No": 259, "Lr": 266, "Rf": 267, "Db": 268,
+    "Sg": 269, "Bh": 270, "Hs": 277, "Mt": 278, "Ds": 281, "Rg": 282, "Cn": 285,
+    "Fl": 289, "Lv": 293, "Ts": 294, "Og": 294
+}
+
+def parse_formula(formula):
+    formula = formula.replace("·", ".")
+    parts = formula.split(".")
+    total_elements = defaultdict(int)
+
+    def parse(part, multiplier=1):
+        stack = []
+        i = 0
+        while i < len(part):
+            if part[i] == "(":
+                stack.append(({}, multiplier))
+                i += 1
+            elif part[i] == ")":
+                i += 1
+                num = ""
+                while i < len(part) and part[i].isdigit():
+                    num += part[i]
+                    i += 1
+                group_multiplier = int(num) if num else 1
+                group_dict, _ = stack.pop()
+                for el, count in group_dict.items():
+                    if stack:
+                        stack[-1][0][el] = stack[-1][0].get(el, 0) + count * group_multiplier
+                    else:
+                        total_elements[el] += count * group_multiplier * multiplier
+            else:
+                match = re.match(r'([A-Z][a-z]?)(\d*)', part[i:])
+                if not match:
+                    return None
+                el = match.group(1)
+                count = int(match.group(2)) if match.group(2) else 1
+                i += len(match.group(0))
+                if el not in massa_atom:
+                    return None
+                if stack:
+                    stack[-1][0][el] = stack[-1][0].get(el, 0) + count
+                else:
+                    total_elements[el] += count * multiplier
+
+    for part in parts:
+        match = re.match(r'^(\d+)([A-Z(].*)', part)
+        mul = int(match.group(1)) if match else 1
+        formula_part = match.group(2) if match else part
+        parse(formula_part, multiplier=mul)
+
+    return total_elements
+
+def hitung_bm(formula):
+    parsed = parse_formula(formula)
+    if not parsed:
+        return None
+    total = sum(massa_atom[el] * jumlah for el, jumlah in parsed.items())
+    return round(total, 4)
+
+ st.header("📌 1. Pembuatan Larutan Standar Induk")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        rumus_garam = st.text_input("🔹 Rumus Kimia Garam", placeholder="Contoh: NaCl")
+        bm_garam = hitung_bm(rumus_garam) if rumus_garam else None
+        st.number_input("BM Garam (g/mol)", value=bm_garam or 0.0, format="%.4f", key="bm_garam")
+
+    with col2:
+        rumus_senyawa = st.text_input("🔹 Rumus Kimia Senyawa", placeholder="Contoh: Cl")
+        bm_senyawa = hitung_bm(rumus_senyawa) if rumus_senyawa else None
+        st.number_input("BM Senyawa (g/mol)", value=bm_senyawa or 0.0, format="%.4f", key="bm_senyawa")
+
+    st.markdown("----")
+    st.subheader("📘 Tabel Massa Atom Relatif (Ar)")
+    df_ar = pd.DataFrame(list(massa_atom.items()), columns=["Unsur", "Ar"]).sort_values("Unsur")
+    st.dataframe(df_ar, use_container_width=True)
 # -----------------------------
 # 1. STANDAR INDUK
 # -----------------------------
