@@ -97,6 +97,9 @@ with tab3:
                 # Ambil koefisien regresi
                 b = model.coef_[0]         # slope
                 a = model.intercept_       # intercept
+                st.session_state["regresi_a"] = a
+                st.session_state["regresi_b"] = b
+
 
                 # Tampilkan grafik
                 fig, ax = plt.subplots()
@@ -127,8 +130,10 @@ with tab4:
     st.header("🧪 4. Hitung Kadar dari Absorbansi (Input Manual)")
 
     absorb_str = st.text_area("Masukkan absorbansi sampel (pisahkan dengan koma)", "0.523, 0.518, 0.521")
-    regresi = st.text_input("Persamaan regresi kalibrasi (format: y = a + bx)", "y = 1.234 + 0.012x")
+    default_regresi = f"y = {st.session_state.get('regresi_a', 1.234):.4f} + {st.session_state.get('regresi_b', 0.012):.4f}x"
+    regresi = st.text_input("Persamaan regresi kalibrasi (format: y = a + bx)", default_regresi)
 
+    
     faktor_pengencer = st.number_input("Faktor Pengenceran", min_value=1.0, value=10.0)
     volume_labu = st.number_input("Volume Labu Takar (mL)", min_value=0.0, value=100.0)
     bobot_sample = st.number_input("Bobot Sampel (gram)", min_value=0.0, value=1.0)
