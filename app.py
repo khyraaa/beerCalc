@@ -26,11 +26,11 @@ with tab1:
     if metode == "Dari zat padat":
         ppm = st.number_input("Konsentrasi larutan yang diinginkan (mg/L)", 0.0)
         V = st.number_input("Volume larutan (L)", 0.0)
-        BM garam = st.number_input("Bobot molekul garam (g/mol)", 0.0)
-        BM senyawa = st.number_input("Bobot molekul senyawa (g/mol)",0.)
+        BMgaram = st.number_input("Bobot molekul garam (g/mol)", 0.0)
+        BMsenyawa = st.number_input("Bobot molekul senyawa (g/mol)",0.)
 
         if st.button("Hitung Massa"):
-            massa = ((BM garam * ppm * V) / BM senyawa )/1000
+            massa = ((BMgaram * ppm * V) / BMsenyawa )/1000
             st.success(f"🔹 Massa zat padat yang dibutuhkan: {massa:.4f} gram")
 
     else:
