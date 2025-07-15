@@ -70,12 +70,12 @@ with tab2:
 
 
 # -----------------------------
-# 3. KALIBRASI
+# 3. KURVA KALIBRASI
 # -----------------------------
 with tab3:
     st.header("📈 3. Kurva Kalibrasi & Regresi")
 
-    kons_cal = st.text_input("Konsentrasi Standar (mol/L)", "0.2, 0.4, 0.6, 0.8, 1.0")
+    kons_cal = st.text_input("Konsentrasi Standar (mg/L)", "0.2, 0.4, 0.6, 0.8, 1.0")
     abs_cal = st.text_input("Absorbansi Standar", "0.25, 0.48, 0.75, 1.03, 1.28")
 
     if st.button("Buat Kurva Kalibrasi"):
@@ -90,7 +90,7 @@ with tab3:
             fig, ax = plt.subplots()
             sns.regplot(x=x, y=y, ax=ax, ci=None, line_kws={"color": "red"})
             ax.set_title("Kurva Kalibrasi UV-Vis")
-            ax.set_xlabel("Konsentrasi (mol/L)")
+            ax.set_xlabel("Konsentrasi (mg/L)")
             ax.set_ylabel("Absorbansi")
             st.pyplot(fig)
 
