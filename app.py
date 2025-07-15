@@ -24,40 +24,54 @@ with tab1:
     metode = st.radio("Metode pembuatan:", ["Dari zat padat", "Dari larutan pekat"])
 
     if metode == "Dari zat padat":
-        ppm = st.number_input("Konsentrasi larutan yang diinginkan (mg/L)", 0.0)
-        V = st.number_input("Volume larutan (mL)", 0.0)
-        BMgaram = st.number_input("Bobot molekul garam (g/mol)", 0.0)
-        BMsenyawa = st.number_input("Bobot molekul senyawa (g/mol)",0.)
+        ppm_str = st.text_input("Konsentrasi larutan yang diinginkan (mg/L)", placeholder="Contoh: 100")
+        V_str = st.text_input("Volume larutan (mL)", placeholder="Contoh: 100")
+        BMgaram_str = st.text_input("Bobot molekul garam (g/mol)", placeholder="Contoh: 58.44")
+        BMsenyawa_str = st.text_input("Bobot molekul senyawa (g/mol)", placeholder="Contoh: 35.45")
 
         if st.button("Hitung Massa"):
-            massa = ((BMgaram * ppm * (V/1000)) / BMsenyawa )/1000
-            st.success(f"🔹 Massa zat padat yang dibutuhkan: {massa:.4f} gram")
+            try:
+                ppm = float(ppm_str)
+                V = float(V_str)
+                BMgaram = float(BMgaram_str)
+                BMsenyawa = float(BMsenyawa_str)
+                massa = ((BMgaram * ppm * (V / 1000)) / BMsenyawa) / 1000
+                st.success(f"🔹 Massa zat padat yang dibutuhkan: {massa:.4f} gram")
+            except:
+                st.error("Mohon isi semua input dengan angka yang valid.")
 
     else:
-        C1 = st.number_input("Konsentrasi larutan pekat (mg/L)", 0.0)
-        C2 = st.number_input("Konsentrasi akhir yang diinginkan (mg/L)", 0.0)
-        V2 = st.number_input("Volume akhir yang diinginkan (mL)", 0.0)
+        C1_str = st.text_input("Konsentrasi larutan pekat (mg/L)", placeholder="Contoh: 1000")
+        C2_str = st.text_input("Konsentrasi akhir yang diinginkan (mg/L)", placeholder="Contoh: 100")
+        V2_str = st.text_input("Volume akhir yang diinginkan (mL)", placeholder="Contoh: 100")
 
         if st.button("Hitung Volume Larutan Pekat"):
-            if C1 > 0:
-                V1 = (C2 * V2) / C1
-                st.success(f"🔹 Ambil sebanyak {V1:.2f} mL larutan pekat dan encerkan hingga {V2} mL")
-            else:
-                st.error("M1 tidak boleh nol")
+            try:
+                C1 = float(C1_str)
+                C2 = float(C2_str)
+                V2 = float(V2_str)
+                if C1 > 0:
+                    V1 = (C2 * V2) / C1
+                    st.success(f"🔹 Ambil sebanyak {V1:.2f} mL larutan pekat dan encerkan hingga {V2} mL")
+                else:
+                    st.error("Konsentrasi larutan pekat tidak boleh nol.")
+            except:
+                st.error("Mohon isi semua input dengan angka yang valid.")
 
 # -----------------------------
 # 2. DERET STANDAR
 # -----------------------------
-with tab2:
-    st.header("📊 2. Deret Standar dari Larutan Induk")
+st.header("📊 2. Deret Standar dari Larutan Induk")
 
-    vol_total = st.number_input("Volume labu masing-masing larutan (mL)", value=10.0)
-    kons_induk = st.number_input("Konsentrasi larutan induk (mol/L)", value=1.0)
-    konsen_str = st.text_input("Deret konsentrasi yang diinginkan (pisahkan dengan koma)", "0.2,0.4,0.6,0.8,1.0")
+    vol_total_str = st.text_input("Volume labu masing-masing larutan (mL)", placeholder="Contoh: 10")
+    kons_induk_str = st.text_input("Konsentrasi larutan induk (mol/L)", placeholder="Contoh: 1.0")
+    konsen_str = st.text_input("Deret konsentrasi yang diinginkan (pisahkan dengan koma)", placeholder="Contoh: 0.2, 0.4, 0.6")
 
     if st.button("Hitung Volume Deret Standar"):
         try:
-            kons_list = [float(i.strip()) for i in konsen_str.split(",")]
+            vol_total = float(vol_total_str)
+            kons_induk = float(kons_induk_str)
+            kons_list = [float(i.strip()) for i in konsen_str.split(",") if i.strip() != ""]
             data = []
             for C2 in kons_list:
                 V1 = (C2 * vol_total) / kons_induk
@@ -65,7 +79,7 @@ with tab2:
             df = pd.DataFrame(data, columns=["Konsentrasi (mg/L)", "Volume Induk (mL)", "Volume Pelarut (mL)"])
             st.dataframe(df)
         except:
-            st.error("Periksa format input.")
+            st.error("Periksa kembali format input Anda. Pastikan semua angka valid dan tidak kosong.")
 
 
 
@@ -75,33 +89,27 @@ with tab2:
 with tab3:
     st.header("📈 3. Kurva Kalibrasi & Regresi")
 
-    kons_cal = st.text_input("Konsentrasi Standar (mg/L)", "0.2, 0.4, 0.6, 0.8, 1.0")
-    abs_cal = st.text_input("Absorbansi Standar", "0.25, 0.48, 0.75, 1.03, 1.28")
+    kons_cal = st.text_input("Konsentrasi Standar (mg/L)", placeholder="Contoh: 0.2, 0.4, 0.6")
+    abs_cal = st.text_input("Absorbansi Standar", placeholder="Contoh: 0.25, 0.48, 0.75")
 
     if st.button("Buat Kurva Kalibrasi"):
         try:
-            # Pisahkan dan bersihkan input
             x = np.array([float(i.strip()) for i in kons_cal.split(",") if i.strip() != ""])
             y = np.array([float(i.strip()) for i in abs_cal.split(",") if i.strip() != ""])
 
-            # Validasi: jumlah x dan y harus sama
             if len(x) != len(y):
                 st.error("Jumlah konsentrasi dan absorbansi tidak sama.")
             else:
-                # Regresi linear: Y = a + bX
                 model = LinearRegression()
                 model.fit(x.reshape(-1, 1), y)
                 y_pred = model.predict(x.reshape(-1, 1))
                 r2 = r2_score(y, y_pred)
 
-                # Ambil koefisien regresi
-                b = model.coef_[0]         # slope
-                a = model.intercept_       # intercept
+                b = model.coef_[0]
+                a = model.intercept_
                 st.session_state["regresi_a"] = a
                 st.session_state["regresi_b"] = b
 
-
-                # Tampilkan grafik
                 fig, ax = plt.subplots()
                 sns.regplot(x=x, y=y, ax=ax, ci=None, line_kws={"color": "red"})
                 ax.set_title("Kurva Kalibrasi UV-Vis")
@@ -109,19 +117,11 @@ with tab3:
                 ax.set_ylabel("Absorbansi")
                 st.pyplot(fig)
 
-                # Tampilkan hasil regresi
                 st.success(f"Persamaan regresi: y = {b:.4f}x + {a:.4f}")
                 st.info(f"Koefisien Determinasi R² = {r2:.4f}")
 
-                # Debugging tambahan (opsional)
-                st.write("📊 Data X (Konsentrasi):", x)
-                st.write("📊 Data Y (Absorbansi):", y)
-                st.write("📈 Slope (b):", b)
-                st.write("📈 Intercept (a):", a)
-
         except Exception as e:
             st.error(f"Terjadi kesalahan: {e}")
-
 
 # -----------------------------
 # 4. ABSORBANSI & KADAR
