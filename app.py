@@ -114,37 +114,47 @@ with tab4:
 
     if st.button("Hitung Kadar Sampel"):
         try:
-            # Ambil absorbansi dalam array
             absorb = np.array([float(i.strip()) for i in absorb_str.split(",")])
-
-            # Parsing persamaan regresi
             a, b = regresi.replace("y", "").replace("=", "").split("x")
             a = float(a.strip())
             b = float(b.strip())
 
-            # Hitung konsentrasi terukur dalam mg/L
             konsentrasi_terukur = (absorb - a) / b
-
-            # Hitung kadar akhir (mg/kg)
             kadar_sampel = (konsentrasi_terukur * faktor_pengencer * volume_labu / 1000) / bobot_sample * 1000
 
-            # Statistik
             rata2 = np.mean(kadar_sampel)
             std = np.std(kadar_sampel, ddof=1)
             rsd = (std / rata2) * 100
             rpd = (np.max(kadar_sampel) - np.min(kadar_sampel)) / rata2 * 100
 
-            # Tampilkan DataFrame
+            # Tabel detail per sampel
             df_sampel = pd.DataFrame({
                 "Absorbansi": absorb,
                 "Konsentrasi Terukur (mg/L)": konsentrasi_terukur,
                 "Kadar Sampel (mg/kg)": kadar_sampel
             })
 
+            # Tabel ringkasan statistik
+            df_ringkasan = pd.DataFrame({
+                "Keterangan": [
+                    "Rata-rata Kadar (mg/kg)", 
+                    "Simpangan Baku (mg/kg)", 
+                    "RSD (%)", 
+                    "RPD (%)"
+                ],
+                "Nilai": [
+                    f"{rata2:.4f}", 
+                    f"{std:.4f}", 
+                    f"{rsd:.2f}", 
+                    f"{rpd:.2f}"
+                ]
+            })
+
+            st.subheader("📊 Data Sampel")
             st.dataframe(df_sampel)
-            st.success(f"Rata-rata kadar sampel: {rata2:.4f} mg/kg")
-            st.info(f"RSD: {rsd:.2f}% | RPD: {rpd:.2f}%")
+
+            st.subheader("📋 Ringkasan Perhitungan")
+            st.table(df_ringkasan)
 
         except Exception as e:
             st.error(f"Error: {e}")
-
